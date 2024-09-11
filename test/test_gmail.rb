@@ -3,7 +3,13 @@ require 'test_helper'
 class GmailTest < Test::Unit::TestCase
   def test_initialize
     imap = mock('imap')
-    Net::IMAP.expects(:new).with('imap.gmail.com', 993, true, nil, false).returns(imap)
+    expected_imap_options =  {
+      port: 993,
+      ssl: {
+        verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+    }
+    Net::IMAP.expects(:new).with('imap.gmail.com', **expected_imap_options).returns(imap)
     gmail = Gmail.new('test', 'password')
   end
 
@@ -78,7 +84,13 @@ class GmailTest < Test::Unit::TestCase
   def setup_mocks(options = {})
     options = {:at_exit => false}.merge(options)
     @imap = mock('imap')
-    Net::IMAP.expects(:new).with('imap.gmail.com', 993, true, nil, false).returns(@imap)
+    expected_imap_options =  {
+      port: 993,
+      ssl: {
+        verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+    }
+    Net::IMAP.expects(:new).with('imap.gmail.com', **expected_imap_options).returns(@imap)
     @gmail = Gmail.new('test@gmail.com', 'password')
 
     # need this for the at_exit block that auto-exits after this test method completes
